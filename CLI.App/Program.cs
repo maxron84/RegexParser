@@ -45,7 +45,7 @@ class Program
 
         Console.WriteLine("# For each Match, type the Index of one of the parsed Groups, or leave blank to look up all results as a Resultset first:");
         group = Console.ReadLine() ?? string.Empty; // 1
-        if (string.IsNullOrEmpty(group) || string.IsNullOrWhiteSpace(group))
+        if (string.IsNullOrEmpty(group))
         {
             Console.WriteLine("# Define delimiter for each column within the Resultset:");
             delimiter = Console.ReadLine() ?? string.Empty;
