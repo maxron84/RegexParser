@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI.App", "CLI.App\CLI.App.csproj", "{4239D098-1AD6-48F6-9F39-19909AF55557}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BL.Lib", "BL.Lib\BL.Lib.csproj", "{FB10FD2A-6819-4566-9A78-71DC2A7982D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4239D098-1AD6-48F6-9F39-19909AF55557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4239D098-1AD6-48F6-9F39-19909AF55557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4239D098-1AD6-48F6-9F39-19909AF55557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4239D098-1AD6-48F6-9F39-19909AF55557}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB10FD2A-6819-4566-9A78-71DC2A7982D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB10FD2A-6819-4566-9A78-71DC2A7982D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB10FD2A-6819-4566-9A78-71DC2A7982D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB10FD2A-6819-4566-9A78-71DC2A7982D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
