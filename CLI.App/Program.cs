@@ -5,8 +5,13 @@ namespace CLI.App;
 
 class Program
 {
-    public static void Main(string[] args)
+    private string[]? _argsBearer;
+
+    public static void Main(string[] args) => _ = new Program().Startup(args);
+
+    private Task Startup(string[] args)
     {
+        _argsBearer = args;
         Reader reader = new();
         Parser parser = new();
         Writer writer = new();
@@ -18,17 +23,19 @@ class Program
         string delimiter = string.Empty;
         int counter = 0;
 
-        SubscribeToAllEvents(reader, parser, writer);
+        _ = SubscribeToAllEvents(reader, parser, writer);
 
-        FetchDataFromUrl(ref url, ref data, ref reader);
-        GetParserInstructions(ref pattern, ref group, ref delimiter);
-        PrintParsedData(ref parser, ref sbProcessedData, ref url, ref data, ref pattern, ref group, ref delimiter, ref counter);
-        SaveParsedDataToFlatfileOrNot(ref sbProcessedData, ref url, ref writer);
+        _ = FetchDataFromUrl(ref url, ref data, ref reader);
+        _ = GetParserInstructions(ref pattern, ref group, ref delimiter);
+        _ = PrintParsedData(ref parser, ref sbProcessedData, ref url, ref data, ref pattern, ref group, ref delimiter, ref counter);
+        _ = SaveParsedDataToFlatfileOrNot(ref sbProcessedData, ref url, ref writer);
 
-        ExitApplicationAfterConfirm();
+        _ = ExitApplicationAfterConfirm();
+
+        return Task.CompletedTask;
     }
 
-    private static Task FetchDataFromUrl(ref string url, ref string data, ref Reader reader)
+    private Task FetchDataFromUrl(ref string url, ref string data, ref Reader reader)
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
         url = Console.ReadLine() ?? string.Empty;
@@ -37,7 +44,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static Task GetParserInstructions(ref string pattern, ref string group, ref string delimiter)
+    private Task GetParserInstructions(ref string pattern, ref string group, ref string delimiter)
     {
         Console.WriteLine("# Paste Regex-Pattern:");
         pattern = Console.ReadLine() ?? string.Empty;
@@ -55,7 +62,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static Task PrintParsedData(ref Parser parser, ref StringBuilder sbProcessedData, ref string url, ref string data, ref string pattern, ref string group, ref string delimiter, ref int counter)
+    private Task PrintParsedData(ref Parser parser, ref StringBuilder sbProcessedData, ref string url, ref string data, ref string pattern, ref string group, ref string delimiter, ref int counter)
     {
         Console.WriteLine(sbProcessedData.AppendLine($"Source:{Environment.NewLine}" + url + $"{Environment.NewLine}{Environment.NewLine}Results:{Environment.NewLine}---{Environment.NewLine}"));
         foreach (string result in parser.GetEachMatch(data, pattern, group, delimiter))
@@ -71,7 +78,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static Task SaveParsedDataToFlatfileOrNot(ref StringBuilder sbProcessedData, ref string url, ref Writer writer)
+    private Task SaveParsedDataToFlatfileOrNot(ref StringBuilder sbProcessedData, ref string url, ref Writer writer)
     {
         Console.WriteLine($"# Save parsed Data to File? y/n{Environment.NewLine}");
         if (Console.ReadKey().KeyChar is 'y' or 'Y')
@@ -84,7 +91,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static Task ExitApplicationAfterConfirm()
+    private Task ExitApplicationAfterConfirm()
     {
         Console.WriteLine($"# Press any key to exit...");
         Console.ReadKey();
@@ -92,7 +99,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static Task SubscribeToAllEvents(Reader reader, Parser parser, Writer writer)
+    private Task SubscribeToAllEvents(Reader reader, Parser parser, Writer writer)
     {
         reader.TaskReporting += TaskReporting_EventHandler;
         parser.TaskReporting += TaskReporting_EventHandler;
@@ -107,13 +114,13 @@ class Program
         return Task.CompletedTask;
     }
 
-    private static void TaskReporting_EventHandler(object? sender, EventArgs e)
+    private void TaskReporting_EventHandler(object? sender, EventArgs e)
     {
         Console.WriteLine("# Processing...");
         Thread.Sleep(500);
     }
 
-    private static void TaskFail_EventHandler(object? sender, EventArgs e)
+    private void TaskFail_EventHandler(object? sender, EventArgs e)
     {
         string message = string.Empty;
 
@@ -133,8 +140,8 @@ class Program
         }
 
         Console.WriteLine(message + Environment.NewLine);
-        Main(null!);
+        Main(_argsBearer ?? new[] { "0" });
     }
 
-    private static void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Done!" + Environment.NewLine);
+    private void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Done!" + Environment.NewLine);
 }
