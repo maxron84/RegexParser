@@ -11,18 +11,19 @@ public class Reader : ALogicBase
 
         if (!url.StartsWith("http"))
         {
-            _ = ExecuteActionAdvanced(async () => output = await File.ReadAllTextAsync(url));
+            _ = ExecuteTaskAdvanced(async () => output = await File.ReadAllTextAsync(url));
             return output;
         }
 
         using (HttpClient client = new HttpClient())
         {
-            HttpResponseMessage response = Task.Run(async () => await client.GetAsync(url)).Result;
+            HttpResponseMessage response = new();
+            _ = ExecuteTaskAdvanced(async () => response = await client.GetAsync(url));
 
             if (!response.IsSuccessStatusCode)
-                throw new NotImplementedException(); // Fire event
+                throw new NotImplementedException();
 
-            _ = ExecuteActionAdvanced(async () => output = await response.Content.ReadAsStringAsync());
+            _ = ExecuteTaskAdvanced(async () => output = await response.Content.ReadAsStringAsync());
         }
 
         return output;

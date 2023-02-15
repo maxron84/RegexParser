@@ -3,20 +3,17 @@ namespace BL.Lib;
 public abstract class ALogicBase
 {
     /// <summary>
-    /// The method first creates a new task by calling "Task.Run" with the provided action. 
-    /// It then enters a loop that runs until the task is completed successfully. Within the loop, 
-    /// the method raises an event to report progress. If the task encounters an exception, 
-    /// the method raises another event to indicate failure and returns a completed task. 
-    /// Once the task has completed successfully, 
-    /// the method raises a final event to indicate success and returns a completed task.
+    /// The method first creates a new task by calling "Task.Run" with the provided action. It then enters a loop that runs until the task is completed successfully. Within the loop, 
+    /// the method raises an event to report progress. If the task encounters an exception, the method raises another event to indicate failure and returns a completed task. 
+    /// Once the task has completed successfully, the method raises a final event to indicate success and returns a completed task.
     /// </summary>
     /// 
-    /// <param name="action">The action to be executed</param>
+    /// <param name="function">The action to be executed</param>
     /// 
     /// <returns>A completed Task</returns>
-    protected Task ExecuteActionAdvanced(Action action)
+    protected Task ExecuteTaskAdvanced(Func<Task> function)
     {
-        Task task = Task.Run(action);
+        Task task = Task.Run(function);
 
         while (!task.IsCompletedSuccessfully)
         {

@@ -6,7 +6,7 @@ public class Writer : ALogicBase
     {
         using (StreamWriter streamWriter = File.AppendText(targetLocation))
         {
-            ExecuteActionAdvanced(async () =>
+            ExecuteTaskAdvanced(async () =>
             {
                 foreach (string match in dataOutput.Split(Environment.NewLine))
                     await streamWriter.WriteLineAsync(match);

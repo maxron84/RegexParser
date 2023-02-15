@@ -140,7 +140,7 @@ class Program
         }
 
         Console.WriteLine(message + Environment.NewLine);
-        Main(_argsBearer ?? new[] { "0" });
+        Main(_argsBearer ?? new[] { string.Empty });
     }
 
     private void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Done!" + Environment.NewLine);
