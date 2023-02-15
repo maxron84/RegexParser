@@ -6,25 +6,13 @@ public class Writer : ALogicBase
     {
         using (StreamWriter streamWriter = File.AppendText(targetLocation))
         {
-            Task fileWritingTask = Task.Run(async () =>
+            ExecuteActionAdvanced(async () =>
             {
                 foreach (string match in dataOutput.Split(Environment.NewLine))
                     await streamWriter.WriteLineAsync(match);
             });
-
-            while (!fileWritingTask.IsCompletedSuccessfully)
-            {
-                OnTaskReporting(EventArgs.Empty);
-
-                if (fileWritingTask.IsFaulted)
-                {
-                    OnTaskFail(EventArgs.Empty);
-                    return Task.CompletedTask;
-                }
-            }
         }
 
-        OnTaskSuccess(EventArgs.Empty);
         return Task.CompletedTask;
     }
 }

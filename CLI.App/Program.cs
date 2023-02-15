@@ -39,7 +39,7 @@ class Program
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
         url = Console.ReadLine() ?? string.Empty;
-        data = reader.GetHtmlData(url);
+        data = reader.GetTextinputData(url);
 
         return Task.CompletedTask;
     }
@@ -51,7 +51,7 @@ class Program
         Console.WriteLine();
 
         Console.WriteLine("# For each Match, type the Index of one of the parsed Groups, or leave blank to look up all results as a Resultset first:");
-        group = Console.ReadLine() ?? string.Empty; // 1
+        group = Console.ReadLine() ?? string.Empty;
         if (string.IsNullOrEmpty(group))
         {
             Console.WriteLine("# Define delimiter for each column within the Resultset:");
@@ -64,7 +64,7 @@ class Program
 
     private Task PrintParsedData(ref Parser parser, ref StringBuilder sbProcessedData, ref string url, ref string data, ref string pattern, ref string group, ref string delimiter, ref int counter)
     {
-        Console.WriteLine(sbProcessedData.AppendLine($"Source:{Environment.NewLine}" + url + $"{Environment.NewLine}{Environment.NewLine}Results:{Environment.NewLine}---{Environment.NewLine}"));
+        Console.WriteLine(sbProcessedData.AppendLine("Source: " + url + $"{Environment.NewLine}---"));
         foreach (string result in parser.GetEachMatch(data, pattern, group, delimiter))
         {
             sbProcessedData.AppendLine(result);

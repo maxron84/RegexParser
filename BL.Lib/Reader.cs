@@ -2,29 +2,16 @@ namespace BL.Lib;
 
 public class Reader : ALogicBase
 {
-    public string GetHtmlData(string url)
+    public string GetTextinputData(string url)
     {
         string output = string.Empty;
 
         if (string.IsNullOrEmpty(url))
-            return string.Empty;
+            return output;
 
         if (!url.StartsWith("http"))
         {
-            Task fileReadingTask = Task.Run(async () => output = await File.ReadAllTextAsync(url));
-
-            while (!fileReadingTask.IsCompletedSuccessfully)
-            {
-                OnTaskReporting(EventArgs.Empty);
-
-                if (fileReadingTask.IsFaulted)
-                {
-                    OnTaskFail(EventArgs.Empty);
-                    return string.Empty;
-                }
-            }
-
-            OnTaskSuccess(EventArgs.Empty);
+            _ = ExecuteActionAdvanced(async () => output = await File.ReadAllTextAsync(url));
             return output;
         }
 
@@ -35,21 +22,9 @@ public class Reader : ALogicBase
             if (!response.IsSuccessStatusCode)
                 throw new NotImplementedException(); // Fire event
 
-            Task readHtmlAsStringTask = Task.Run(async () => output = await response.Content.ReadAsStringAsync());
-
-            while (!readHtmlAsStringTask.IsCompletedSuccessfully)
-            {
-                OnTaskReporting(EventArgs.Empty);
-
-                if (readHtmlAsStringTask.IsFaulted)
-                {
-                    OnTaskFail(EventArgs.Empty);
-                    return string.Empty;
-                }
-            }
+            _ = ExecuteActionAdvanced(async () => output = await response.Content.ReadAsStringAsync());
         }
 
-        OnTaskSuccess(EventArgs.Empty);
         return output;
     }
 }

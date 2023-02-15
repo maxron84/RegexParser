@@ -31,11 +31,11 @@ public class Parser : ALogicBase
                     {
                         sbResults.Append(matches[i].Groups[j].Value);
 
-                        if (j < matches[i].Groups.Count - 1)
-                            sbResults.Append(delimiter);
-                    }
+                        if (j == matches[i].Groups.Count - 1)
+                            break;
 
-                    sbResults.AppendLine();
+                        sbResults.Append(delimiter);
+                    }
 
                     yield return sbResults.ToString();
 
