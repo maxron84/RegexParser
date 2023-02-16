@@ -28,13 +28,7 @@ public class ClientsideTest
 
     public static IEnumerable<object[]> GetTestData()
     {
-        yield return new object[]
-        {
-            "https://memory-alpha.fandom.com/wiki/Federation_starship_classes",
-            @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">",
-            string.Empty,
-            ",",
-            """
+        string output = """
             title="Starship">,Starship,ship
             title="Ship class">,Ship class,class
             title="Class III neutronic fuel carrier">,Class III neutronic fuel carrier,Class
@@ -161,7 +155,17 @@ public class ClientsideTest
             title="wikipedia:Ship class">,wikipedia:Ship class,class
             title="Category:Federation starship classes">,Category:Federation starship classes,class
             
-            """
-        };
+            """;
+
+        string url = "https://memory-alpha.fandom.com/wiki/Federation_starship_classes";
+        string pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
+        string group = string.Empty;
+        string delimiter = ",";
+
+        yield return new object[] { url, pattern, group, delimiter, output };
+
+        // url = @"C:\test.html"; // This would be the downloaded website saved as html-file locally.
+
+        // yield return new object[] { url, pattern, group, delimiter, output };
     }
 }
