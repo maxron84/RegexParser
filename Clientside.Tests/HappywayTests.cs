@@ -1,10 +1,9 @@
 using System.Text;
 using BL.Lib;
-using Xunit;
 
 namespace Clientside.Tests;
 
-public class ClientsideTest
+public class HappywayTests
 {
     [Theory]
     [MemberData(nameof(GetTestData))]
@@ -164,8 +163,8 @@ public class ClientsideTest
 
         yield return new object[] { url, pattern, group, delimiter, output };
 
-        // url = @"C:\test.html"; // This would be the downloaded website saved as html-file locally.
+        url = @"C:\test.html"; // This would be the website saved as html-file locally.
 
-        // yield return new object[] { url, pattern, group, delimiter, output };
+        yield return new object[] { url, pattern, group, delimiter, output };
     }
 }

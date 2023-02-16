@@ -24,6 +24,8 @@ public abstract class ALogicBase
                 OnTaskFail(EventArgs.Empty);
                 return Task.CompletedTask;
             }
+
+            Thread.Sleep(500);
         }
 
         OnTaskSuccess(EventArgs.Empty);

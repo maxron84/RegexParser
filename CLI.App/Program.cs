@@ -8,139 +8,149 @@ class Program
     private Reader _reader = new();
     private Parser _parser = new();
     private Writer _writer = new();
-    private StringBuilder _sbProcessedData = new();
     private string _url = string.Empty;
     private string _data = string.Empty;
     private string _pattern = string.Empty;
     private string _group = string.Empty;
     private string _delimiter = string.Empty;
-    private int _counter = 0;
-    private string[]? _argsBearer;
+    private StringBuilder _sbProcessedData = new();
+    private string[] _argsBearer = new[] { string.Empty };
 
-    public static void Main(string[] args) => _ = new Program().Startup(args);
-
-    private Task Startup(string[] args)
+    public static void Main(string[] args)
     {
-        _argsBearer = args;
+        Program program = new();
+        _ = program.Config(args);
+        _ = program.Startup();
+    }
 
-        _ = SubscribeToAllEvents(_reader, _parser, _writer);
-
-        _ = FetchDataFromUrl(_url, _data, _reader);
-        _ = GetParserInstructions(_pattern, _group, _delimiter);
-        _ = PrintParsedData(_parser, _sbProcessedData, _url, _data, _pattern, _group, _delimiter, _counter);
-        _ = SaveParsedDataToFlatfileOrNot(_sbProcessedData, _url, _writer);
-
-        _ = ExitApplicationAfterConfirm();
+    private Task Config(string[] args)
+    {
+        _ = SubscribeToAllEvents();
 
         return Task.CompletedTask;
     }
 
-    private Task FetchDataFromUrl(string url, string data, Reader reader)
+    private Task Startup()
+    {
+        _ = FetchDataFromUrl();
+        _ = GetParserInstructions();
+        _ = PrintParsedData();
+        _ = SaveParsedDataToFlatfileOrNot();
+
+        Console.WriteLine($"# Press r to restart, or any other key to exit...");
+        if (Console.ReadKey().KeyChar is 'r' or 'R')
+        {
+            Console.WriteLine();
+            _ = Startup();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task FetchDataFromUrl()
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
-        url = Console.ReadLine() ?? string.Empty;
-        data = reader.GetTextinputData(url);
+        _url = Console.ReadLine() ?? string.Empty;
+        _data = _reader.GetTextinputData(_url);
 
         return Task.CompletedTask;
     }
 
-    private Task GetParserInstructions(string pattern, string group, string delimiter)
+    private Task GetParserInstructions()
     {
         Console.WriteLine("# Paste Regex-Pattern:");
-        pattern = Console.ReadLine() ?? string.Empty;
+        _pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
+        _pattern = Console.ReadLine() ?? string.Empty;
         Console.WriteLine();
 
         Console.WriteLine("# For each Match, type the Index of one of the parsed Groups, or leave blank to look up all results as a Resultset first:");
-        group = Console.ReadLine() ?? string.Empty;
-        if (string.IsNullOrEmpty(group))
+        _group = Console.ReadLine() ?? string.Empty;
+        if (string.IsNullOrEmpty(_group))
         {
             Console.WriteLine("# Define delimiter for each column within the Resultset:");
-            delimiter = Console.ReadLine() ?? string.Empty;
+            _delimiter = Console.ReadLine() ?? string.Empty;
         }
         Console.WriteLine();
 
         return Task.CompletedTask;
     }
 
-    private Task PrintParsedData(Parser parser, StringBuilder sbProcessedData, string url, string data, string pattern, string group, string delimiter, int counter)
+    private Task PrintParsedData()
     {
-        Console.WriteLine(sbProcessedData.AppendLine("Source: " + url + $"{Environment.NewLine}---"));
-        foreach (string result in parser.GetEachMatch(data, pattern, group, delimiter))
+        int counter = 0;
+        _sbProcessedData.AppendLine("Source: " + _url + $"{Environment.NewLine}---");
+        foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter))
         {
-            sbProcessedData.AppendLine(result);
+            _sbProcessedData.AppendLine(result);
             Console.WriteLine(result);
             counter++;
         }
 
-        Console.WriteLine(sbProcessedData.Append($"---{Environment.NewLine}Total Results: " + counter));
+        _sbProcessedData.Append($"---{Environment.NewLine}Total Results: " + counter);
+
+        return Task.CompletedTask;
+    }
+
+    private Task SaveParsedDataToFlatfileOrNot()
+    {
+        Console.WriteLine($"# Save parsed Data to File? y/n{Environment.NewLine}");
+        if (Console.ReadKey().KeyChar is 'y' or 'Y')
+        {
+            string filename = string.Join("-", _url.Split(Path.GetInvalidFileNameChars()));
+            string targetlocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Results\{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            _writer.WriteFlatfile(_sbProcessedData.ToString(), targetlocation);
+        }
+
         Console.WriteLine();
 
         return Task.CompletedTask;
     }
 
-    private Task SaveParsedDataToFlatfileOrNot(StringBuilder sbProcessedData, string url, Writer writer)
+    private Task SubscribeToAllEvents()
     {
-        Console.WriteLine($"# Save parsed Data to File? y/n{Environment.NewLine}");
-        if (Console.ReadKey().KeyChar is 'y' or 'Y')
-        {
-            string filename = string.Join("-", url.Split(Path.GetInvalidFileNameChars()));
-            string targetlocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Results\{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
-            writer.WriteFlatfile(sbProcessedData.ToString(), targetlocation);
-        }
+        _reader.TaskReporting += TaskReporting_EventHandler;
+        _parser.TaskReporting += TaskReporting_EventHandler;
+        _writer.TaskReporting += TaskReporting_EventHandler;
+        _reader.TaskFail += TaskFail_EventHandler;
+        _parser.TaskFail += TaskFail_EventHandler;
+        _writer.TaskFail += TaskFail_EventHandler;
+        _reader.TaskSuccess += TaskSuccess_EventHandler;
+        _parser.TaskSuccess += TaskSuccess_EventHandler;
+        _writer.TaskSuccess += TaskSuccess_EventHandler;
 
         return Task.CompletedTask;
     }
 
-    private Task ExitApplicationAfterConfirm()
-    {
-        Console.WriteLine($"# Press any key to exit...");
-        Console.ReadKey();
-
-        return Task.CompletedTask;
-    }
-
-    private Task SubscribeToAllEvents(Reader reader, Parser parser, Writer writer)
-    {
-        reader.TaskReporting += TaskReporting_EventHandler;
-        parser.TaskReporting += TaskReporting_EventHandler;
-        writer.TaskReporting += TaskReporting_EventHandler;
-        reader.TaskFail += TaskFail_EventHandler;
-        parser.TaskFail += TaskFail_EventHandler;
-        writer.TaskFail += TaskFail_EventHandler;
-        reader.TaskSuccess += TaskSuccess_EventHandler;
-        parser.TaskSuccess += TaskSuccess_EventHandler;
-        writer.TaskSuccess += TaskSuccess_EventHandler;
-
-        return Task.CompletedTask;
-    }
-
-    private void TaskReporting_EventHandler(object? sender, EventArgs e)
-    {
-        Console.WriteLine("# Processing...");
-        Thread.Sleep(500);
-    }
+    private void TaskReporting_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Processing...");
 
     private void TaskFail_EventHandler(object? sender, EventArgs e)
     {
         string message = string.Empty;
 
-        switch (sender)
+        try
         {
-            case Reader:
-                message = "# ERROR: Failed to read from source!";
-                break;
-            case Parser:
-                message = "# ERROR: Invalid input!";
-                break;
-            case Writer:
-                message = "# ERROR: Failure while writing to file!";
-                break;
-            default:
-                throw new InvalidCastException();
+            switch (sender)
+            {
+                case Reader:
+                    message = "# ERROR: Failed to read from source!";
+                    break;
+                case Parser:
+                    message = "# ERROR: Invalid input!";
+                    break;
+                case Writer:
+                    message = "# ERROR: Failure while writing to file!";
+                    break;
+                default:
+                    throw new InvalidCastException();
+            }
+        }
+        catch (InvalidCastException ex)
+        {
+            Console.WriteLine("# ERROR: " + ex.Message);
         }
 
         Console.WriteLine(message + Environment.NewLine);
-        Main(_argsBearer ?? new[] { string.Empty });
+        _ = Startup();
     }
 
     private void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Done!" + Environment.NewLine);
