@@ -5,6 +5,16 @@ namespace CLI.App;
 
 class Program
 {
+    private Reader _reader = new();
+    private Parser _parser = new();
+    private Writer _writer = new();
+    private StringBuilder _sbProcessedData = new();
+    private string _url = string.Empty;
+    private string _data = string.Empty;
+    private string _pattern = string.Empty;
+    private string _group = string.Empty;
+    private string _delimiter = string.Empty;
+    private int _counter = 0;
     private string[]? _argsBearer;
 
     public static void Main(string[] args) => _ = new Program().Startup(args);
@@ -12,30 +22,20 @@ class Program
     private Task Startup(string[] args)
     {
         _argsBearer = args;
-        Reader reader = new();
-        Parser parser = new();
-        Writer writer = new();
-        StringBuilder sbProcessedData = new();
-        string url = string.Empty;
-        string data = string.Empty;
-        string pattern = string.Empty;
-        string group = string.Empty;
-        string delimiter = string.Empty;
-        int counter = 0;
 
-        _ = SubscribeToAllEvents(reader, parser, writer);
+        _ = SubscribeToAllEvents(_reader, _parser, _writer);
 
-        _ = FetchDataFromUrl(ref url, ref data, ref reader);
-        _ = GetParserInstructions(ref pattern, ref group, ref delimiter);
-        _ = PrintParsedData(ref parser, ref sbProcessedData, ref url, ref data, ref pattern, ref group, ref delimiter, ref counter);
-        _ = SaveParsedDataToFlatfileOrNot(ref sbProcessedData, ref url, ref writer);
+        _ = FetchDataFromUrl(_url, _data, _reader);
+        _ = GetParserInstructions(_pattern, _group, _delimiter);
+        _ = PrintParsedData(_parser, _sbProcessedData, _url, _data, _pattern, _group, _delimiter, _counter);
+        _ = SaveParsedDataToFlatfileOrNot(_sbProcessedData, _url, _writer);
 
         _ = ExitApplicationAfterConfirm();
 
         return Task.CompletedTask;
     }
 
-    private Task FetchDataFromUrl(ref string url, ref string data, ref Reader reader)
+    private Task FetchDataFromUrl(string url, string data, Reader reader)
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
         url = Console.ReadLine() ?? string.Empty;
@@ -44,7 +44,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private Task GetParserInstructions(ref string pattern, ref string group, ref string delimiter)
+    private Task GetParserInstructions(string pattern, string group, string delimiter)
     {
         Console.WriteLine("# Paste Regex-Pattern:");
         pattern = Console.ReadLine() ?? string.Empty;
@@ -62,7 +62,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private Task PrintParsedData(ref Parser parser, ref StringBuilder sbProcessedData, ref string url, ref string data, ref string pattern, ref string group, ref string delimiter, ref int counter)
+    private Task PrintParsedData(Parser parser, StringBuilder sbProcessedData, string url, string data, string pattern, string group, string delimiter, int counter)
     {
         Console.WriteLine(sbProcessedData.AppendLine("Source: " + url + $"{Environment.NewLine}---"));
         foreach (string result in parser.GetEachMatch(data, pattern, group, delimiter))
@@ -78,7 +78,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private Task SaveParsedDataToFlatfileOrNot(ref StringBuilder sbProcessedData, ref string url, ref Writer writer)
+    private Task SaveParsedDataToFlatfileOrNot(StringBuilder sbProcessedData, string url, Writer writer)
     {
         Console.WriteLine($"# Save parsed Data to File? y/n{Environment.NewLine}");
         if (Console.ReadKey().KeyChar is 'y' or 'Y')
