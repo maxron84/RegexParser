@@ -38,12 +38,7 @@ class Program
         _ = PrintParsedData();
         _ = SaveParsedDataToFlatfileConditional();
 
-        Console.WriteLine($"# Press r to restart, or any other key to exit...");
-        if (Console.ReadKey().KeyChar is 'r' or 'R')
-        {
-            Console.WriteLine();
-            _ = Startup();
-        }
+        _ = ConcludeCurrentProcedure();
 
         return Task.CompletedTask;
     }
@@ -75,6 +70,7 @@ class Program
 
         Console.WriteLine("# Case-Sensitive? y/n");
         _isCaseSensitive = Console.ReadKey().KeyChar is 'y' or 'Y' ? true : false;
+        Console.WriteLine();
 
         return Task.CompletedTask;
     }
@@ -84,6 +80,7 @@ class Program
         int counter = 0;
         string header = "Source: " + _url + $"{Environment.NewLine}---";
         _sbProcessedData.AppendLine(header);
+        Console.WriteLine();
         Console.WriteLine(header);
 
         foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter, _isCaseSensitive))
@@ -96,6 +93,7 @@ class Program
         string footer = $"---{Environment.NewLine}Total Results: " + counter;
         _sbProcessedData.Append(footer);
         Console.WriteLine(footer);
+        Console.WriteLine();
 
         return Task.CompletedTask;
     }
@@ -107,10 +105,23 @@ class Program
         {
             string filename = string.Join("-", _url.Split(Path.GetInvalidFileNameChars()));
             string targetlocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Results\{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            Console.WriteLine();
             _writer.WriteFlatfile(_sbProcessedData.ToString(), targetlocation);
         }
 
-        Console.WriteLine();
+        return Task.CompletedTask;
+    }
+
+    private Task ConcludeCurrentProcedure()
+    {
+        _sbProcessedData.Clear();
+
+        Console.WriteLine($"# Press r to restart, or any other key to exit...");
+        if (Console.ReadKey().KeyChar is 'r' or 'R')
+        {
+            Console.WriteLine();
+            _ = Startup();
+        }
 
         return Task.CompletedTask;
     }
