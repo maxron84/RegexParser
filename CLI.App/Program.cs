@@ -13,6 +13,7 @@ class Program
     private string _pattern = string.Empty;
     private string _group = string.Empty;
     private string _delimiter = string.Empty;
+    private bool _isCaseSensitive = false;
     private StringBuilder _sbProcessedData = new();
     private string[] _argsBearer = new[] { string.Empty };
 
@@ -32,10 +33,10 @@ class Program
 
     private Task Startup()
     {
-        _ = FetchDataFromUrl();
-        _ = GetParserInstructions();
+        _ = SetDataFromUrl();
+        _ = SetParserInstructions();
         _ = PrintParsedData();
-        _ = SaveParsedDataToFlatfileOrNot();
+        _ = SaveParsedDataToFlatfileConditional();
 
         Console.WriteLine($"# Press r to restart, or any other key to exit...");
         if (Console.ReadKey().KeyChar is 'r' or 'R')
@@ -47,7 +48,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private Task FetchDataFromUrl()
+    private Task SetDataFromUrl()
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
         _url = Console.ReadLine() ?? string.Empty;
@@ -56,7 +57,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private Task GetParserInstructions()
+    private Task SetParserInstructions()
     {
         Console.WriteLine("# Paste Regex-Pattern:");
         _pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
@@ -72,26 +73,34 @@ class Program
         }
         Console.WriteLine();
 
+        Console.WriteLine("# Case-Sensitive? y/n");
+        _isCaseSensitive = Console.ReadKey().KeyChar is 'y' or 'Y' ? true : false;
+
         return Task.CompletedTask;
     }
 
     private Task PrintParsedData()
     {
         int counter = 0;
-        _sbProcessedData.AppendLine("Source: " + _url + $"{Environment.NewLine}---");
-        foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter))
+        string header = "Source: " + _url + $"{Environment.NewLine}---";
+        _sbProcessedData.AppendLine(header);
+        Console.WriteLine(header);
+
+        foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter, _isCaseSensitive))
         {
             _sbProcessedData.AppendLine(result);
             Console.WriteLine(result);
             counter++;
         }
 
-        _sbProcessedData.Append($"---{Environment.NewLine}Total Results: " + counter);
+        string footer = $"---{Environment.NewLine}Total Results: " + counter;
+        _sbProcessedData.Append(footer);
+        Console.WriteLine(footer);
 
         return Task.CompletedTask;
     }
 
-    private Task SaveParsedDataToFlatfileOrNot()
+    private Task SaveParsedDataToFlatfileConditional()
     {
         Console.WriteLine($"# Save parsed Data to File? y/n{Environment.NewLine}");
         if (Console.ReadKey().KeyChar is 'y' or 'Y')

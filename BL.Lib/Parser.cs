@@ -5,13 +5,14 @@ namespace BL.Lib;
 
 public class Parser : ALogicBase
 {
-    public IEnumerable<string> GetEachMatch(string dataInput, string pattern, string group, string delimiter)
+    public IEnumerable<string> GetEachMatch(string dataInput, string pattern, string group, string delimiter, bool isCaseSensitive)
     {
         MatchCollection matches;
 
         try
         {
-            matches = GetMatches(dataInput, pattern);
+            RegexOptions regexOptions = isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            matches = GetMatches(dataInput, pattern, regexOptions);
         }
         catch (ArgumentException)
         {
@@ -47,12 +48,10 @@ public class Parser : ALogicBase
                 foreach (Match match in matches)
                     yield return match.Groups[target].Value;
             }
-
-            OnTaskSuccess(EventArgs.Empty);
         }
     }
 
-    private MatchCollection GetMatches(string data, string pattern, RegexOptions regexOptions = RegexOptions.IgnoreCase)
+    private MatchCollection GetMatches(string data, string pattern, RegexOptions regexOptions)
     {
         return Regex.Matches(data, pattern, regexOptions);
     }
