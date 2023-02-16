@@ -7,14 +7,14 @@ public class HappywayTests
 {
     [Theory]
     [MemberData(nameof(GetTestData))]
-    public Task Can_ParseWebsite(string url, string pattern, string group, string delimiter, string output)
+    public Task Can_ParseWebsite(string url, string pattern, string group, string delimiter, string output, bool isCaseSensitive)
     {
         // Given is MemberData
 
         // When
         string input = new Reader().GetTextinputData(url);
         StringBuilder sb = new();
-        IEnumerable<string> candidates = new Parser().GetEachMatch(input, pattern, group, delimiter);
+        IEnumerable<string> candidates = new Parser().GetEachMatch(input, pattern, group, delimiter, isCaseSensitive);
 
         foreach (var item in candidates)
             sb.AppendLine(item);
@@ -160,11 +160,12 @@ public class HappywayTests
         string pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
         string group = string.Empty;
         string delimiter = ",";
+        bool isCaseSensitive = false;
 
-        yield return new object[] { url, pattern, group, delimiter, output };
+        yield return new object[] { url, pattern, group, delimiter, output, isCaseSensitive };
 
-        url = @"C:\test.html"; // This would be the website saved as html-file locally.
+        // url = @"C:\test.html"; // This would be the website saved as html-file locally.
 
-        yield return new object[] { url, pattern, group, delimiter, output };
+        // yield return new object[] { url, pattern, group, delimiter, output };
     }
 }
