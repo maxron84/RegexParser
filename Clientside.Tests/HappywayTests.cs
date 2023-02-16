@@ -164,8 +164,8 @@ public class HappywayTests
 
         yield return new object[] { url, pattern, group, delimiter, output, isCaseSensitive };
 
-        // url = @"C:\test.html"; // This would be the website saved as html-file locally.
+        // url = @"Harddrive\Location\test.html"; // This would be the website saved as html-file in your machine.
 
-        // yield return new object[] { url, pattern, group, delimiter, output };
+        // yield return new object[] { url, pattern, group, delimiter, output, isCaseSensitive };
     }
 }
