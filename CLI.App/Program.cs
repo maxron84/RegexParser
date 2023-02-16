@@ -64,7 +64,7 @@ class Program
         _pattern = Console.ReadLine() ?? string.Empty;
         Console.WriteLine();
 
-        Console.WriteLine("# For each Match, type the Index of one of the parsed Groups, or leave blank to look up all results as a Resultset first:");
+        Console.WriteLine("# For each Match, type the Index of one of the parsed Groups (respectively Columns), or leave blank to look up all columns Resultset first:");
         _group = Console.ReadLine() ?? string.Empty;
         if (string.IsNullOrEmpty(_group))
         {
