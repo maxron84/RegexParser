@@ -8,17 +8,8 @@ public class Parser : ALogicBase
     public IEnumerable<string> GetEachMatch(string dataInput, string pattern, string group, string delimiter, bool isCaseSensitive)
     {
         MatchCollection matches;
-
-        try
-        {
-            RegexOptions regexOptions = isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-            matches = GetMatches(dataInput, pattern, regexOptions);
-        }
-        catch (ArgumentException)
-        {
-            OnTaskFail(EventArgs.Empty);
-            throw;
-        }
+        RegexOptions regexOptions = isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+        matches = GetMatches(dataInput, pattern, regexOptions);
 
         if (matches.Any())
         {

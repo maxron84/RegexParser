@@ -7,7 +7,7 @@ public class Reader : ALogicBase
         string output = string.Empty;
 
         if (string.IsNullOrEmpty(url))
-            return output;
+            throw new ArgumentException("Path cannot be null or empty!");
 
         if (!url.StartsWith("http"))
         {
@@ -20,8 +20,14 @@ public class Reader : ALogicBase
             HttpResponseMessage response = new();
             _ = ExecuteTaskAdvanced(async () => response = await client.GetAsync(url));
 
-            if (!response.IsSuccessStatusCode)
-                throw new NotImplementedException();
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException)
+            {
+                throw;
+            }
 
             _ = ExecuteTaskAdvanced(async () => output = await response.Content.ReadAsStringAsync());
         }

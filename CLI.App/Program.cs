@@ -47,7 +47,21 @@ class Program
     {
         Console.WriteLine("# Paste Website-URL or Path to local Textfile:");
         _url = Console.ReadLine() ?? string.Empty;
-        _data = _reader.GetTextinputData(_url);
+
+        try
+        {
+            _data = _reader.GetTextinputData(_url);
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"# ERROR: {ex.Message} {Environment.NewLine}");
+            _ = Startup();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"# BAD RESPONSE: {(int)ex.StatusCode!} - {ex.StatusCode}{Environment.NewLine}");
+            _ = Startup();
+        }
 
         return Task.CompletedTask;
     }
@@ -55,7 +69,6 @@ class Program
     private Task SetParserInstructions()
     {
         Console.WriteLine("# Paste Regex-Pattern:");
-        _pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
         _pattern = Console.ReadLine() ?? string.Empty;
         Console.WriteLine();
 
