@@ -14,7 +14,7 @@ public class SadwayTests
         Action action = () => new Reader().GetTextinputData(url);
 
         // Then
-        Assert.Throws(typeof(HttpRequestException), action);
+        Assert.Throws<HttpRequestException>(action);
 
         return Task.CompletedTask;
     }
