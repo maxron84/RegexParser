@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using BL.Lib;
 
 namespace CLI.App;
@@ -15,7 +16,6 @@ class Program
     private string _delimiter = string.Empty;
     private bool _isCaseSensitive = false;
     private StringBuilder _sbProcessedData = new();
-    private string[] _argsBearer = new[] { string.Empty };
 
     public static void Main(string[] args)
     {
@@ -27,6 +27,7 @@ class Program
     private Task Config(string[] args)
     {
         _ = SubscribeToAllEvents();
+        // Further config options using args here
 
         return Task.CompletedTask;
     }
@@ -72,7 +73,7 @@ class Program
         _pattern = Console.ReadLine() ?? string.Empty;
         Console.WriteLine();
 
-        Console.WriteLine("# For each Match, type the Index of one of the parsed Groups (respectively Columns), or leave blank to look up all columns Resultset first:");
+        Console.WriteLine($"# For each Match, type the Index of one of the parsed Groups (respectively Columns),{Environment.NewLine}# or leave blank to look up all columns Resultset first:");
         _group = Console.ReadLine() ?? string.Empty;
         if (string.IsNullOrEmpty(_group))
         {
@@ -91,22 +92,28 @@ class Program
     private Task PrintParsedData()
     {
         int counter = 0;
-        string header = "Source: " + _url + $"{Environment.NewLine}---";
+        string header = $"Source: {_url}{Environment.NewLine}---";
         _sbProcessedData.AppendLine(header);
-        Console.WriteLine();
-        Console.WriteLine(header);
+        Console.WriteLine($"{Environment.NewLine}{header}");
 
-        foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter, _isCaseSensitive))
+        try
         {
-            _sbProcessedData.AppendLine(result);
-            Console.WriteLine(result);
-            counter++;
+            foreach (string result in _parser.GetEachMatch(_data, _pattern, _group, _delimiter, _isCaseSensitive))
+            {
+                _sbProcessedData.AppendLine(result);
+                Console.WriteLine(result);
+                counter++;
+            }
+        }
+        catch (RegexParseException ex)
+        {
+            Console.WriteLine($"{Environment.NewLine}ERROR: {ex.Message}{Environment.NewLine}");
+            _ = Startup();
         }
 
-        string footer = $"---{Environment.NewLine}Total Results: " + counter;
+        string footer = $"---{Environment.NewLine}Total Results: {counter}";
         _sbProcessedData.Append(footer);
-        Console.WriteLine(footer);
-        Console.WriteLine();
+        Console.WriteLine($"{footer}{Environment.NewLine}");
 
         return Task.CompletedTask;
     }
@@ -118,9 +125,10 @@ class Program
         {
             string filename = string.Join("-", _url.Split(Path.GetInvalidFileNameChars()));
             string targetlocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Results\{filename}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
-            Console.WriteLine();
             _writer.WriteFlatfile(_sbProcessedData.ToString(), targetlocation);
         }
+
+        Console.WriteLine();
 
         return Task.CompletedTask;
     }
@@ -179,12 +187,12 @@ class Program
         }
         catch (InvalidCastException ex)
         {
-            Console.WriteLine("# ERROR: " + ex.Message);
+            Console.WriteLine($"# ERROR: {ex.Message}");
         }
 
-        Console.WriteLine(message + Environment.NewLine);
+        Console.WriteLine($"{message}{Environment.NewLine}");
         _ = Startup();
     }
 
-    private void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine("# Done!" + Environment.NewLine);
+    private void TaskSuccess_EventHandler(object? sender, EventArgs e) => Console.WriteLine($"# Done!{Environment.NewLine}");
 }

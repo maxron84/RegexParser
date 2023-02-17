@@ -9,7 +9,15 @@ public class Parser : ALogicBase
     {
         MatchCollection matches;
         RegexOptions regexOptions = isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-        matches = GetMatches(dataInput, pattern, regexOptions);
+        
+        try
+        {
+            matches = GetMatches(dataInput, pattern, regexOptions);
+        }
+        catch (RegexParseException)
+        {
+            throw;
+        }
 
         if (matches.Any())
         {
@@ -44,6 +52,13 @@ public class Parser : ALogicBase
 
     private MatchCollection GetMatches(string data, string pattern, RegexOptions regexOptions)
     {
-        return Regex.Matches(data, pattern, regexOptions);
+        try
+        {
+            return Regex.Matches(data, pattern, regexOptions);
+        }
+        catch (RegexParseException)
+        {
+            throw;
+        }
     }
 }
