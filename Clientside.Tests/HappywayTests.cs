@@ -156,16 +156,12 @@ public class HappywayTests
             
             """;
 
-        string url = "https://memory-alpha.fandom.com/wiki/Federation_starship_classes";
+        string url = @"C:\test.html"; // Downloaded from: https://memory-alpha.fandom.com/wiki/Federation_starship_classes
         string pattern = @"title=""([^\""]*(class|ship|vessel)[^\""]*)"">";
         string group = string.Empty;
         string delimiter = ",";
         bool isCaseSensitive = false;
 
         yield return new object[] { url, pattern, group, delimiter, output, isCaseSensitive };
-
-        // url = @"...\test.html"; // Insert your local file as testsubject.
-
-        // yield return new object[] { url, pattern, group, delimiter, output, isCaseSensitive };
     }
 }
